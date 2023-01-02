@@ -1,3 +1,6 @@
 # artifact-recommendation-demo4
-# pip install pandas
-# pip install openpyxl
+To run the file, you may need to install the following (in terminal):
+pip install pandas
+pip install openpyxl
+
+# plz read the instruction.pdf to start
