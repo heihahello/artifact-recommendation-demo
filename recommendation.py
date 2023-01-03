@@ -52,7 +52,7 @@ class recommendation:
             basic_dmg = (basic[self.damage_dependence + '_number'] + \
                 self.character[self.damage_dependence])
 
-        #Ei(注：本部分为将军专武薙刀专用,可忽略)
+        #Ei(注：本部分为薙刀专用,可忽略 only for Engulfing Lightning weapon)
         # weapon_bonus = (basic['e_r_percent'] + self.character['e_r'] + 30 - \
         #   100) / 100 * 0.28
         # if weapon_bonus >= 0.8:
@@ -75,8 +75,11 @@ class recommendation:
         not_crit_damage = basic_dmg * (1 + elemental_bonus / 100)
 
         #calculate new critical rate
-        new_crit_rate = basic['crit_rate_percent'] / 100 \
-            + self.character['crit_rate'] / 100
+        try:
+            new_crit_rate = basic['crit_rate_percent'] / 100 \
+                + self.character['crit_rate'] / 100
+        except:
+            new_crit_rate = self.character['crit_rate'] / 100
         
         #calculate the expected value of dmg as the score of this artifact set
         score = crit_damage * new_crit_rate + \
@@ -92,11 +95,11 @@ class recommendation:
         value as set's effects (i.e.[{'crit_dmg_percent': 112.0}, 13])
         """
         all_artifacts = {
-            "冠":[],
-            "花":[],
-            "羽":[],
-            "沙":[],
-            "杯":[]
+            "circlect":[],
+            "flower":[],
+            "plume":[],
+            "sands":[],
+            "goblet":[]
         }
         
         #sort all artifacts by position from datas and put in all_artifacts
@@ -109,14 +112,14 @@ class recommendation:
 
         #generate all sets and put in set_dict with set's effects
         set_dict = {}
-        for artifact_冠 in all_artifacts["冠"]:
-            for artifact_花 in all_artifacts["花"]:
-                for artifact_羽 in all_artifacts["羽"]:
-                    for artifact_沙 in all_artifacts["沙"]:
-                        for artifact_杯 in all_artifacts["杯"]:
+        for artifact_circlect in all_artifacts["circlect"]:
+            for artifact_flower in all_artifacts["flower"]:
+                for artifact_plume in all_artifacts["plume"]:
+                    for artifact_sands in all_artifacts["sands"]:
+                        for artifact_goblet in all_artifacts["goblet"]:
                             new_set = artifacts_setup.artifact_set(
-                                [artifact_冠, artifact_花, artifact_羽, 
-                                    artifact_沙, artifact_杯])
+                                [artifact_circlect, artifact_flower, artifact_plume, 
+                                    artifact_sands, artifact_goblet])
                             set_dict[new_set.serial_numbers] = new_set.effects
         
         return set_dict
