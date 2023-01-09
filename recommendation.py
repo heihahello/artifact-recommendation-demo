@@ -6,7 +6,7 @@ class recommendation:
     The class is to make the recommendations
     """
     elements = ['anemo','pyro','geo','hydro','dendro','cryo','electro']
-    def __init__(self, filename, character, damage_dependence):
+    def __init__(self, artifact_file, character_file):
         """
         The constructor of recommendation class, setting up the character info 
         and retriving the data from excel
@@ -16,10 +16,17 @@ class recommendation:
         character: a dict containing base value of character
         damage_dependence: a string of attribute which damage dealt depends on
         """
-        self.character = character
-        self.damage_dependence = damage_dependence
-        self.datas = pd.read_excel(filename)
-        print(self.datas)
+        #get artifact datas
+        self.artifact_datas = pd.read_excel(artifact_file)
+        print(self.artifact_datas)
+
+        #get character infos
+        raw_character = pd.read_excel(character_file)
+        character_info = raw_character.set_index(list(raw_character)[0])
+        self.character = character_info.to_dict()[list(character_info)[0]]
+        self.damage_dependence = self.character.popitem()[1]
+
+
 
     def calculate_artifacts(self, effects):
         """
@@ -58,7 +65,7 @@ class recommendation:
         # if weapon_bonus >= 0.8:
         #     basic_dmg += self.character[self.damage_dependence] * 0.8
         # else:
-        #     basic_dmg += self.character[self.damage_dependence] * weapon_bonus
+        #     basic_dmg += self.character[self.damage_dependence] *weapon_bonus
         
         #目前4件套效果(set4 effect)只制作了绝缘套(13)
         if extra == 13:
@@ -88,7 +95,8 @@ class recommendation:
 
     def generate_set(self):
         """
-        this func generates all possible combination of artifact set from datas
+        this func generates all possible combination of artifact set from 
+        artifact_datas
         ---
         Return:
         a dict of all set generated with key as artifacts' serial_numbers and 
@@ -102,9 +110,10 @@ class recommendation:
             "goblet":[]
         }
         
-        #sort all artifacts by position from datas and put in all_artifacts
-        for i in range(self.datas.shape[0]):
-            info = list(self.datas.iloc[i])
+        #sort all artifacts by position from artifact_datas and put in 
+        #all_artifacts dict with key of positions
+        for i in range(self.artifact_datas.shape[0]):
+            info = list(self.artifact_datas.iloc[i])
             #print(info)
             artifact_to_add = artifacts_setup.artifact(i, info[0], info[1], 
                 info[2:])
@@ -112,14 +121,13 @@ class recommendation:
 
         #generate all sets and put in set_dict with set's effects
         set_dict = {}
-        for artifact_circlect in all_artifacts["circlect"]:
-            for artifact_flower in all_artifacts["flower"]:
-                for artifact_plume in all_artifacts["plume"]:
-                    for artifact_sands in all_artifacts["sands"]:
-                        for artifact_goblet in all_artifacts["goblet"]:
+        for circlect in all_artifacts["circlect"]:
+            for flower in all_artifacts["flower"]:
+                for plume in all_artifacts["plume"]:
+                    for sands in all_artifacts["sands"]:
+                        for goblet in all_artifacts["goblet"]:
                             new_set = artifacts_setup.artifact_set(
-                                [artifact_circlect, artifact_flower, artifact_plume, 
-                                    artifact_sands, artifact_goblet])
+                                [circlect, flower, plume, sands, goblet])
                             set_dict[new_set.serial_numbers] = new_set.effects
         
         return set_dict
@@ -171,22 +179,8 @@ class recommendation:
 ############################# start here #####################################
 ##############################################################################
 
-#input your character info with NO artifacts wearing!!!
-#only the pure numeric values, no need to convert to percent
-character = {
-            'hp':12907,
-            'atk':945,
-            'def':789,
-            'e_m':0,
-            'crit_rate':5,
-            'crit_dmg':50,
-            'e_r': 187.1
-        }
-#input the attribute which the damage depends on
-damage_dependence = 'atk'
 #number of best results you want to check
-num = 6
-#now, save your change and run this file :)
+num = 10
 
-new_recommendation = recommendation('artifacts.xlsx', character, damage_dependence)
+new_recommendation = recommendation('artifacts.xlsx', 'character.xlsx')
 new_recommendation.recommend(num)
