@@ -21,12 +21,10 @@ class recommendation:
         print(self.artifact_datas)
 
         #get character infos
-        raw_character = pd.read_excel(character_file)
-        character_info = raw_character.set_index(list(raw_character)[0])
-        self.character = character_info.to_dict()[list(character_info)[0]]
+        raw_character = pd.read_excel(character_file, names = ['attribute', 'value'])
+        character_info = raw_character.set_index('attribute')
+        self.character = character_info.to_dict()['value']
         self.damage_dependence = self.character.popitem()[1]
-
-
 
     def calculate_artifacts(self, effects):
         """
